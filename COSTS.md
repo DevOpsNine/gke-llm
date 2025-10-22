@@ -11,9 +11,10 @@ This document provides cost estimates for running LLM inference on GKE with GPU 
 | **GKE Cluster** | Management fee | $74.40 |
 | **CPU Nodes** | 2x n1-standard-4 (24/7) | ~$292.00 |
 | **GPU Nodes** | 1x n1-standard-8 + T4 GPU (24/7) | ~$588.00 |
+| **Cloud NAT** | NAT gateway (24/7) | ~$45.00 |
 | **Networking** | Load Balancer + egress | ~$40.00 |
 | **Storage** | 200GB SSD + misc | ~$40.00 |
-| **TOTAL (24/7 operation)** | | **~$1,034.40/month** |
+| **TOTAL (24/7 operation)** | | **~$1,079.40/month** |
 
 ### Cost-Optimized Configuration
 
@@ -22,9 +23,10 @@ This document provides cost estimates for running LLM inference on GKE with GPU 
 | **GKE Cluster** | Management fee | $74.40 |
 | **CPU Nodes** | 1x n1-standard-2 (24/7) | ~$73.00 |
 | **GPU Nodes** | 1x Spot n1-standard-8 + T4 (12h/day) | ~$147.00 |
+| **Cloud NAT** | NAT gateway (24/7) | ~$45.00 |
 | **Networking** | Load Balancer + egress | ~$40.00 |
 | **Storage** | 100GB Standard + misc | ~$10.00 |
-| **TOTAL (12h/day operation)** | | **~$344.40/month** |
+| **TOTAL (12h/day operation)** | | **~$389.40/month** |
 
 ## 📊 GPU Pricing Comparison (us-central1)
 

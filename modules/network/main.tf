@@ -13,6 +13,9 @@ resource "google_compute_subnetwork" "subnet" {
   network       = google_compute_network.vpc.id
   project       = var.project_id
 
+  # Enable private Google access for private nodes
+  private_ip_google_access = true
+
   secondary_ip_range {
     range_name    = var.pods_range_name
     ip_cidr_range = var.pods_cidr
@@ -21,6 +24,29 @@ resource "google_compute_subnetwork" "subnet" {
   secondary_ip_range {
     range_name    = var.services_range_name
     ip_cidr_range = var.services_cidr
+  }
+}
+
+# Cloud Router for NAT
+resource "google_compute_router" "router" {
+  name    = "${var.network_name}-router"
+  region  = var.region
+  network = google_compute_network.vpc.id
+  project = var.project_id
+}
+
+# Cloud NAT for private nodes to access internet
+resource "google_compute_router_nat" "nat" {
+  name                               = "${var.network_name}-nat"
+  router                             = google_compute_router.router.name
+  region                             = var.region
+  project                            = var.project_id
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
   }
 }
 

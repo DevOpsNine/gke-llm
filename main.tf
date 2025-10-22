@@ -32,6 +32,12 @@ module "gke_cluster" {
   logging_service        = var.logging_service
   monitoring_service     = var.monitoring_service
 
+  # Private cluster configuration
+  enable_private_nodes        = var.enable_private_nodes
+  enable_private_endpoint     = var.enable_private_endpoint
+  master_ipv4_cidr_block      = var.master_ipv4_cidr_block
+  master_authorized_networks  = var.master_authorized_networks
+
   depends_on = [module.network]
 }
 

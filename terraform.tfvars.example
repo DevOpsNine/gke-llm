@@ -38,3 +38,17 @@ gpu_node_count      = 1
 gpu_min_nodes       = 0  # Scale to 0 when not in use
 gpu_max_nodes       = 3
 gpu_enable_spot     = false  # Set to true for cost savings (60-70% discount)
+
+# Private Cluster Configuration
+enable_private_nodes    = true   # Nodes don't have public IPs (requires Cloud NAT)
+enable_private_endpoint = false  # Control plane accessible from internet (true = private only)
+master_ipv4_cidr_block  = "172.16.0.0/28"
+
+# Master authorized networks (who can access the control plane)
+# To restrict access, replace with your specific IP ranges
+master_authorized_networks = [
+  {
+    cidr_block   = "0.0.0.0/0"
+    display_name = "All networks"
+  }
+]

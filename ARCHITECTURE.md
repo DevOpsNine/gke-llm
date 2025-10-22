@@ -9,14 +9,16 @@ This document provides a detailed overview of the infrastructure architecture fo
 │                         GCP Project                              │
 │                                                                   │
 │  ┌────────────────────────────────────────────────────────┐    │
-│  │                    VPC Network                          │    │
+│  │              Private VPC Network + Cloud NAT            │    │
 │  │  (10.0.0.0/24 + secondary ranges)                      │    │
 │  │                                                          │    │
 │  │  ┌────────────────────────────────────────────────┐    │    │
-│  │  │         Regional Subnet (us-central1)          │    │    │
+│  │  │   Regional Subnet (us-central1) + NAT          │    │    │
+│  │  │   (Private Google Access Enabled)              │    │    │
 │  │  │                                                 │    │    │
 │  │  │  ┌──────────────────────────────────────┐     │    │    │
-│  │  │  │   GKE Cluster (llm-deployment)       │     │    │    │
+│  │  │  │   Private GKE Cluster                │     │    │    │
+│  │  │  │   (llm-deployment)                   │     │    │    │
 │  │  │  │                                       │     │    │    │
 │  │  │  │  ┌─────────────────────────────┐    │     │    │    │
 │  │  │  │  │   CPU Node Pool             │    │     │    │    │
@@ -127,7 +129,25 @@ GCP Project
 
 ```
 ┌────────────────────────────────────────┐
-│         Network Policies               │
+│      Private Nodes (No Public IPs)     │
+│  - Nodes isolated from internet        │
+│  - Outbound via Cloud NAT only         │
+└────────────────────────────────────────┘
+         ↓
+┌────────────────────────────────────────┐
+│      Cloud NAT + Router                │
+│  - Secure internet access              │
+│  - Managed egress IPs                  │
+└────────────────────────────────────────┘
+         ↓
+┌────────────────────────────────────────┐
+│      Private Google Access             │
+│  - Access Google APIs privately        │
+│  - No public IP needed                 │
+└────────────────────────────────────────┘
+         ↓
+┌────────────────────────────────────────┐
+│      Network Policies                  │
 │  - Namespace isolation                 │
 │  - Pod-to-pod communication rules      │
 └────────────────────────────────────────┘

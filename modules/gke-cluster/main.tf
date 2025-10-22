@@ -50,6 +50,27 @@ resource "google_container_cluster" "cluster" {
     }
   }
 
+  # Private cluster configuration
+  private_cluster_config {
+    enable_private_nodes    = var.enable_private_nodes
+    enable_private_endpoint = var.enable_private_endpoint
+    master_ipv4_cidr_block  = var.master_ipv4_cidr_block
+  }
+
+  # Master authorized networks (who can access control plane)
+  dynamic "master_authorized_networks_config" {
+    for_each = length(var.master_authorized_networks) > 0 ? [1] : []
+    content {
+      dynamic "cidr_blocks" {
+        for_each = var.master_authorized_networks
+        content {
+          cidr_block   = cidr_blocks.value.cidr_block
+          display_name = cidr_blocks.value.display_name
+        }
+      }
+    }
+  }
+
   # Enable features
   enable_shielded_nodes = var.enable_shielded_nodes
   enable_legacy_abac    = false

@@ -8,11 +8,9 @@ Quick reference guide for navigating the project.
 |-------------------|--------------|
 | **Get started quickly** | [QUICKSTART.md](QUICKSTART.md) |
 | **Understand the project** | [README.md](README.md) |
-| **Learn about modules** | [MODULES.md](MODULES.md) |
 | **See architecture** | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | **Optimize costs** | [COSTS.md](COSTS.md) |
 | **Contribute** | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| **See what was built** | [SUMMARY.md](SUMMARY.md) |
 
 ## 📁 File Structure
 
@@ -23,11 +21,9 @@ GCP/ai-lab/
 │   ├── INDEX.md              ← You are here
 │   ├── README.md             ← Main documentation
 │   ├── QUICKSTART.md         ← 20-minute quick start
-│   ├── MODULES.md            ← Module documentation
 │   ├── ARCHITECTURE.md       ← Architecture details
 │   ├── COSTS.md              ← Cost optimization
-│   ├── CONTRIBUTING.md       ← How to contribute
-│   └── SUMMARY.md            ← Project summary
+│   └── CONTRIBUTING.md       ← How to contribute
 │
 ├── 🏗️ Infrastructure Code
 │   ├── main.tf              ← Root orchestration
@@ -83,16 +79,9 @@ GCP/ai-lab/
 3. Run `./scripts/deploy.sh`
 4. Read [README.md](README.md) for details
 
-### For Module Users
-1. Read [MODULES.md](MODULES.md)
-2. Check individual module READMEs:
-   - [Network Module](modules/network/README.md)
-   - [GKE Cluster Module](modules/gke-cluster/README.md)
-   - [Node Pool Module](modules/node-pool/README.md)
-
 ### For Architects
 1. Read [ARCHITECTURE.md](ARCHITECTURE.md)
-2. Review module structure in [MODULES.md](MODULES.md)
+2. Review module structure in `modules/` directory
 3. Check [COSTS.md](COSTS.md) for cost planning
 
 ### For Contributors
@@ -151,12 +140,11 @@ GCP/ai-lab/
 
 ## 📈 Project Stats
 
-- **Total Files**: 39+
+- **Total Files**: 33
 - **Terraform Modules**: 3
 - **K8s Manifests**: 9
-- **Documentation Pages**: 8
+- **Documentation Pages**: 5
 - **Automation Scripts**: 3
-- **Total Lines**: ~6,000+
 
 ## 💡 Tips
 
@@ -170,8 +158,8 @@ GCP/ai-lab/
 
 1. Check [README.md](README.md) troubleshooting section
 2. Review [ARCHITECTURE.md](ARCHITECTURE.md) for design questions
-3. See [MODULES.md](MODULES.md) for module details
-4. Check [COSTS.md](COSTS.md) for cost optimization
+3. Check module READMEs in `modules/` directory for module details
+4. See [COSTS.md](COSTS.md) for cost optimization
 
 ## 📞 Support
 

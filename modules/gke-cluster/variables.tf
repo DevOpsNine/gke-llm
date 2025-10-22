@@ -57,3 +57,36 @@ variable "monitoring_service" {
   default     = "monitoring.googleapis.com/kubernetes"
 }
 
+# Private Cluster Configuration
+variable "enable_private_nodes" {
+  description = "Enable private nodes (nodes will not have external IP addresses)"
+  type        = bool
+  default     = true
+}
+
+variable "enable_private_endpoint" {
+  description = "Enable private endpoint (control plane will not be accessible from internet)"
+  type        = bool
+  default     = false
+}
+
+variable "master_ipv4_cidr_block" {
+  description = "The IP range in CIDR notation for the master network"
+  type        = string
+  default     = "172.16.0.0/28"
+}
+
+variable "master_authorized_networks" {
+  description = "List of master authorized networks"
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = [
+    {
+      cidr_block   = "0.0.0.0/0"
+      display_name = "All networks"
+    }
+  ]
+}
+

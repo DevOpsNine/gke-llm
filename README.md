@@ -5,13 +5,13 @@ This Terraform configuration deploys a production-ready Google Kubernetes Engine
 ## 🏗️ Architecture
 
 - **Modular Design**: Clean separation of concerns with reusable Terraform modules
-- **VPC Network**: Custom VPC with separate IP ranges for nodes, pods, and services
-- **GKE Cluster**: Regional cluster with high availability
+- **Private VPC Network**: Custom VPC with private nodes and Cloud NAT
+- **GKE Cluster**: Regional private cluster with high availability
 - **Node Pools**:
   - **CPU Pool**: For general workloads and system components
   - **GPU Pool**: For LLM inference with NVIDIA GPUs
 - **Auto-scaling**: Both node pools and pod autoscaling configured
-- **Security**: Workload Identity, Shielded Nodes, and Network Policies enabled
+- **Security**: Private nodes, Workload Identity, Shielded Nodes, and Network Policies enabled
 
 ## 📦 Modular Structure
 
@@ -28,10 +28,9 @@ This project uses a modular Terraform architecture for better maintainability an
 ```
 
 📖 **Documentation:**
-- **[MODULES.md](MODULES.md)** - Detailed module documentation
+- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 20 minutes
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design
 - **[COSTS.md](COSTS.md)** - Cost estimation and optimization
-- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 20 minutes
 
 ## 📋 Prerequisites
 
@@ -314,21 +313,36 @@ kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container
 - Add more GPUs per node
 - Use quantized models (4-bit, 8-bit)
 
-## 🔒 Security Best Practices
+## 🔒 Security Features
 
-1. **Use Private Cluster** (Production)
-   - Add to `main.tf`:
-   ```hcl
-   private_cluster_config {
-     enable_private_nodes    = true
-     enable_private_endpoint = false
-   }
-   ```
+### Enabled by Default
 
-2. **Enable Binary Authorization**
-3. **Use Workload Identity** (already enabled)
-4. **Implement Network Policies**
-5. **Rotate Credentials Regularly**
+1. ✅ **Private Nodes** - Nodes don't have public IP addresses
+2. ✅ **Cloud NAT** - Private nodes access internet securely
+3. ✅ **Private Google Access** - Access Google services without public IPs
+4. ✅ **Workload Identity** - Secure GCP service access
+5. ✅ **Shielded Nodes** - Secure boot and integrity monitoring
+6. ✅ **Network Policies** - Pod-level network isolation
+7. ✅ **Master Authorized Networks** - Control who can access cluster
+
+### Additional Security Options
+
+To make the control plane fully private:
+```hcl
+# In terraform.tfvars
+enable_private_endpoint = true
+```
+
+To restrict control plane access to specific IPs:
+```hcl
+# In terraform.tfvars
+master_authorized_networks = [
+  {
+    cidr_block   = "YOUR_IP/32"
+    display_name = "Your office"
+  }
+]
+```
 
 ## 🧹 Cleanup
 

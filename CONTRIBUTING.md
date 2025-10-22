@@ -20,11 +20,10 @@ GCP/ai-lab/
 
 Documentation Files:
 ├── README.md           # Main documentation
+├── INDEX.md            # Navigation guide
 ├── QUICKSTART.md       # Quick start guide
-├── MODULES.md          # Module documentation
 ├── ARCHITECTURE.md     # Architecture overview
 ├── COSTS.md            # Cost information
-├── MIGRATION_GUIDE.md  # Migration instructions
 └── CONTRIBUTING.md     # This file
 ```
 
