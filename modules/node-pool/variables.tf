@@ -79,7 +79,7 @@ variable "gpu_driver_version" {
 variable "enable_spot_instances" {
   description = "Enable spot/preemptible instances"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_secure_boot" {
