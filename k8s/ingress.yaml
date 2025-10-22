@@ -1,0 +1,35 @@
+# Optional: Ingress for external access with domain
+# Requires an Ingress Controller (e.g., nginx-ingress or GKE Ingress)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-inference-ingress
+  namespace: llm-inference
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    # For HTTPS, add SSL certificate annotations
+    # networking.gke.io/managed-certificates: "llm-cert"
+    # kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+  - host: llm.yourdomain.com  # Replace with your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: llm-inference
+            port:
+              number: 80
+---
+# Optional: Managed certificate for HTTPS
+# apiVersion: networking.gke.io/v1
+# kind: ManagedCertificate
+# metadata:
+#   name: llm-cert
+#   namespace: llm-inference
+# spec:
+#   domains:
+#   - llm.yourdomain.com
+

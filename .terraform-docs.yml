@@ -1,0 +1,22 @@
+# Terraform Docs Configuration
+# Run: terraform-docs markdown table . > MODULE_REFERENCE.md
+
+formatter: "markdown table"
+
+sections:
+  show:
+    - requirements
+    - providers
+    - modules
+    - resources
+    - inputs
+    - outputs
+
+output:
+  file: MODULE_REFERENCE.md
+  mode: replace
+
+sort:
+  enabled: true
+  by: name
+

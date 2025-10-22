@@ -1,0 +1,40 @@
+# Example Terraform Variables File
+# Copy this file to terraform.tfvars and update with your values
+
+# Project Configuration
+project_id   = "your-gcp-project-id"
+project_name = "llm-deployment"
+region       = "us-central1"
+
+# Network Configuration
+subnet_cidr   = "10.0.0.0/24"
+pods_cidr     = "10.1.0.0/16"
+services_cidr = "10.2.0.0/16"
+
+# GKE Cluster Configuration
+maintenance_start_time = "03:00"
+enable_shielded_nodes  = true
+logging_service        = "logging.googleapis.com/kubernetes"
+monitoring_service     = "monitoring.googleapis.com/kubernetes"
+
+# CPU Node Pool Configuration
+cpu_machine_type = "n1-standard-4"
+cpu_node_count   = 2
+cpu_min_nodes    = 1
+cpu_max_nodes    = 5
+cpu_enable_spot  = false  # Set to true for cost savings (60-70% discount)
+
+# GPU Node Pool Configuration
+# Available GPU types:
+# - nvidia-tesla-t4 (Good for inference, cost-effective, 16GB)
+# - nvidia-tesla-v100 (High performance, 16GB)
+# - nvidia-tesla-a100 (Best performance, most expensive, 40GB)
+# - nvidia-l4 (Latest generation, balanced, 24GB)
+gpu_machine_type    = "n1-standard-8"
+gpu_type            = "nvidia-tesla-t4"
+gpu_count_per_node  = 1
+gpu_driver_version  = "DEFAULT"
+gpu_node_count      = 1
+gpu_min_nodes       = 0  # Scale to 0 when not in use
+gpu_max_nodes       = 3
+gpu_enable_spot     = false  # Set to true for cost savings (60-70% discount)

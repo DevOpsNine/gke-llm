@@ -1,0 +1,17 @@
+# ServiceMonitor for Prometheus (if using Prometheus Operator)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: llm-inference-metrics
+  namespace: llm-inference
+  labels:
+    app: llm-inference
+spec:
+  selector:
+    matchLabels:
+      app: llm-inference
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 30s
+

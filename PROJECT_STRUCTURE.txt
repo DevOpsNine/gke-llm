@@ -1,0 +1,47 @@
+.
+|-- ARCHITECTURE.md
+|-- COSTS.md
+|-- MODULES.md
+|-- Makefile
+|-- PROJECT_STRUCTURE.txt
+|-- QUICKSTART.md
+|-- README.md
+|-- k8s
+|   |-- ingress.yaml
+|   |-- llm-deployment.yaml
+|   |-- llm-hpa.yaml
+|   |-- llm-pvc.yaml
+|   |-- llm-service.yaml
+|   |-- monitoring
+|   |   `-- prometheus-servicemonitor.yaml
+|   |-- namespace.yaml
+|   |-- secrets-example.yaml
+|   `-- text-generation-inference.yaml
+|-- main.tf
+|-- modules
+|   |-- gke-cluster
+|   |   |-- README.md
+|   |   |-- main.tf
+|   |   |-- outputs.tf
+|   |   `-- variables.tf
+|   |-- network
+|   |   |-- README.md
+|   |   |-- main.tf
+|   |   |-- outputs.tf
+|   |   `-- variables.tf
+|   `-- node-pool
+|       |-- README.md
+|       |-- main.tf
+|       |-- outputs.tf
+|       `-- variables.tf
+|-- outputs.tf
+|-- provider.tf
+|-- scripts
+|   |-- deploy.sh
+|   |-- setup.sh
+|   `-- test-llm.sh
+|-- terraform.tfvars
+|-- terraform.tfvars.example
+`-- variables.tf
+
+8 directories, 37 files

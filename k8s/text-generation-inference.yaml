@@ -1,0 +1,114 @@
+# Alternative: Text Generation Inference (TGI) by Hugging Face
+# Uncomment to use TGI instead of vLLM
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-tgi
+  namespace: llm-inference
+  labels:
+    app: llm-tgi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-tgi
+  template:
+    metadata:
+      labels:
+        app: llm-tgi
+    spec:
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Equal
+        value: "present"
+        effect: NoSchedule
+      
+      nodeSelector:
+        workload: gpu-llm
+      
+      containers:
+      - name: tgi
+        image: ghcr.io/huggingface/text-generation-inference:latest
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: MODEL_ID
+          value: "mistralai/Mistral-7B-Instruct-v0.2"
+        - name: NUM_SHARD
+          value: "1"
+        - name: MAX_BATCH_PREFILL_TOKENS
+          value: "4096"
+        - name: MAX_INPUT_LENGTH
+          value: "4000"
+        - name: MAX_TOTAL_TOKENS
+          value: "4096"
+        - name: HUGGING_FACE_HUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: huggingface-token
+              key: token
+              optional: true
+        
+        command:
+        - text-generation-launcher
+        - --model-id
+        - $(MODEL_ID)
+        - --num-shard
+        - $(NUM_SHARD)
+        - --port
+        - "80"
+        - --max-batch-prefill-tokens
+        - $(MAX_BATCH_PREFILL_TOKENS)
+        - --max-input-length
+        - $(MAX_INPUT_LENGTH)
+        - --max-total-tokens
+        - $(MAX_TOTAL_TOKENS)
+        
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "4"
+            nvidia.com/gpu: "1"
+          limits:
+            memory: "32Gi"
+            cpu: "8"
+            nvidia.com/gpu: "1"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 30
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        
+        volumeMounts:
+        - name: model-cache
+          mountPath: /data
+      
+      volumes:
+      - name: model-cache
+        emptyDir:
+          sizeLimit: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-tgi
+  namespace: llm-inference
+spec:
+  type: LoadBalancer
+  selector:
+    app: llm-tgi
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+
