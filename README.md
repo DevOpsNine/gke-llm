@@ -30,7 +30,6 @@ This project uses a modular Terraform architecture for better maintainability an
 📖 **Documentation:**
 - **[MODULES.md](MODULES.md)** - Detailed module documentation
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design
-- **[MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)** - Migrate from monolithic to modular
 - **[COSTS.md](COSTS.md)** - Cost estimation and optimization
 - **[QUICKSTART.md](QUICKSTART.md)** - Get started in 20 minutes
 

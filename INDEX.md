@@ -11,7 +11,6 @@ Quick reference guide for navigating the project.
 | **Learn about modules** | [MODULES.md](MODULES.md) |
 | **See architecture** | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | **Optimize costs** | [COSTS.md](COSTS.md) |
-| **Migrate from old version** | [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) |
 | **Contribute** | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | **See what was built** | [SUMMARY.md](SUMMARY.md) |
 
@@ -26,7 +25,6 @@ GCP/ai-lab/
 │   ├── QUICKSTART.md         ← 20-minute quick start
 │   ├── MODULES.md            ← Module documentation
 │   ├── ARCHITECTURE.md       ← Architecture details
-│   ├── MIGRATION_GUIDE.md    ← Migration instructions
 │   ├── COSTS.md              ← Cost optimization
 │   ├── CONTRIBUTING.md       ← How to contribute
 │   └── SUMMARY.md            ← Project summary
@@ -97,11 +95,6 @@ GCP/ai-lab/
 2. Review module structure in [MODULES.md](MODULES.md)
 3. Check [COSTS.md](COSTS.md) for cost planning
 
-### For Migrators
-1. Read [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
-2. Backup existing state
-3. Follow migration steps
-
 ### For Contributors
 1. Read [CONTRIBUTING.md](CONTRIBUTING.md)
 2. Review module structure
@@ -158,12 +151,12 @@ GCP/ai-lab/
 
 ## 📈 Project Stats
 
-- **Total Files**: 40+
+- **Total Files**: 39+
 - **Terraform Modules**: 3
 - **K8s Manifests**: 9
-- **Documentation Pages**: 9
+- **Documentation Pages**: 8
 - **Automation Scripts**: 3
-- **Total Lines**: ~6,500+
+- **Total Lines**: ~6,000+
 
 ## 💡 Tips
 
@@ -178,7 +171,7 @@ GCP/ai-lab/
 1. Check [README.md](README.md) troubleshooting section
 2. Review [ARCHITECTURE.md](ARCHITECTURE.md) for design questions
 3. See [MODULES.md](MODULES.md) for module details
-4. Check [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for upgrade issues
+4. Check [COSTS.md](COSTS.md) for cost optimization
 
 ## 📞 Support
 

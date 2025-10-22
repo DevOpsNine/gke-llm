@@ -95,17 +95,16 @@ scripts/
 
 ```
 Documentation:
-├── README.md            # Main guide (341 lines)
+├── README.md            # Main guide (363 lines)
 ├── QUICKSTART.md        # 20-minute quick start
 ├── MODULES.md           # Module documentation
 ├── ARCHITECTURE.md      # Architecture details
-├── MIGRATION_GUIDE.md   # Migration instructions
 ├── COSTS.md             # Cost optimization
 ├── CONTRIBUTING.md      # Contribution guide
 └── Makefile            # Common commands
 ```
 
-**Total Documentation:** **~4,500 lines** of comprehensive guides
+**Total Documentation:** **~4,200 lines** of comprehensive guides
 
 ## 🎯 Key Features
 
@@ -163,13 +162,14 @@ Documentation:
 
 | Document | Lines | Purpose |
 |----------|-------|---------|
-| README.md | 341 | Main guide |
-| MODULES.md | 300+ | Module docs |
+| README.md | 363 | Main guide |
+| MODULES.md | 411 | Module docs |
 | ARCHITECTURE.md | 420+ | Architecture |
-| MIGRATION_GUIDE.md | 280+ | Migration |
-| COSTS.md | 260+ | Cost info |
+| COSTS.md | 260 | Cost info |
 | QUICKSTART.md | 166 | Quick start |
 | CONTRIBUTING.md | 300+ | Contribution |
+| SUMMARY.md | 404 | Project summary |
+| INDEX.md | 193 | Navigation guide |
 
 ## 💰 Cost Efficiency
 
