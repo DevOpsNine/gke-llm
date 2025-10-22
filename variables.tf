@@ -90,7 +90,7 @@ variable "cpu_max_nodes" {
 variable "cpu_enable_spot" {
   description = "Enable spot/preemptible instances for CPU nodes"
   type        = bool
-  default     = false
+  default     = true
 }
 
 # GPU Node Pool Configuration
@@ -143,7 +143,7 @@ variable "gpu_max_nodes" {
 variable "gpu_enable_spot" {
   description = "Enable spot/preemptible instances for GPU nodes"
   type        = bool
-  default     = false
+  default     = true
 }
 
 # Private Cluster Configuration
