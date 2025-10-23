@@ -52,3 +52,16 @@ master_authorized_networks = [
     display_name = "All networks"
   }
 ]
+
+# Deletion protection (set to false to allow terraform destroy)
+deletion_protection = false
+
+# Node Zones - Use same zone for both CPU and GPU for simplicity
+# Recommended: us-central1-a (good GPU availability)
+# Single zone:
+cpu_node_locations = ["us-central1-a"]
+gpu_node_locations = ["us-central1-a"]
+
+# Multi-zone (for HA):
+# cpu_node_locations = ["us-central1-a", "us-central1-c"]
+# gpu_node_locations = ["us-central1-a", "us-central1-c"]

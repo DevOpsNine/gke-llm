@@ -84,13 +84,19 @@ variable "cpu_min_nodes" {
 variable "cpu_max_nodes" {
   description = "Maximum number of CPU nodes"
   type        = number
-  default     = 5
+  default     = 3
 }
 
 variable "cpu_enable_spot" {
   description = "Enable spot/preemptible instances for CPU nodes"
   type        = bool
-  default     = true
+  default     = false
+}
+
+variable "cpu_node_locations" {
+  description = "Specific zones for CPU nodes (e.g., [\"us-central1-a\"]). Leave empty for all zones."
+  type        = list(string)
+  default     = []
 }
 
 # GPU Node Pool Configuration
@@ -143,7 +149,7 @@ variable "gpu_max_nodes" {
 variable "gpu_enable_spot" {
   description = "Enable spot/preemptible instances for GPU nodes"
   type        = bool
-  default     = true
+  default     = false
 }
 
 # Private Cluster Configuration
@@ -177,4 +183,16 @@ variable "master_authorized_networks" {
       display_name = "All networks"
     }
   ]
+}
+
+variable "deletion_protection" {
+  description = "Whether or not to allow Terraform to destroy the cluster. Set to false to allow deletion."
+  type        = bool
+  default     = false
+}
+
+variable "gpu_node_locations" {
+  description = "Specific zones for GPU nodes (e.g., [\"us-central1-a\", \"us-central1-c\"]). Leave empty for all zones."
+  type        = list(string)
+  default     = []
 }

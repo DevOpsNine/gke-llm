@@ -37,6 +37,9 @@ module "gke_cluster" {
   enable_private_endpoint     = var.enable_private_endpoint
   master_ipv4_cidr_block      = var.master_ipv4_cidr_block
   master_authorized_networks  = var.master_authorized_networks
+  
+  # Deletion protection
+  deletion_protection = var.deletion_protection
 
   depends_on = [module.network]
 }
@@ -63,6 +66,10 @@ module "cpu_node_pool" {
   }
 
   enable_spot_instances = var.cpu_enable_spot
+  enable_autoscaling    = false
+  
+  # Specify zones for CPU nodes
+  node_locations = var.cpu_node_locations
 
   depends_on = [module.gke_cluster]
 }
@@ -81,8 +88,8 @@ module "gpu_node_pool" {
   min_node_count = var.gpu_min_nodes
   max_node_count = var.gpu_max_nodes
 
-  disk_size_gb = 200
-  disk_type    = "pd-ssd"
+  disk_size_gb = 100
+  disk_type    = "pd-standard"
 
   # GPU configuration
   gpu_type           = var.gpu_type
@@ -94,6 +101,10 @@ module "gpu_node_pool" {
   }
 
   enable_spot_instances = var.gpu_enable_spot
+  enable_autoscaling    = false
+  
+  # Specify zones for GPU availability
+  node_locations = var.gpu_node_locations
 
   depends_on = [module.gke_cluster]
 }

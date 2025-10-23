@@ -13,6 +13,12 @@ variable "region" {
   type        = string
 }
 
+variable "node_locations" {
+  description = "List of zones to create nodes in. Leave empty for all zones in region."
+  type        = list(string)
+  default     = []
+}
+
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
@@ -79,7 +85,7 @@ variable "gpu_driver_version" {
 variable "enable_spot_instances" {
   description = "Enable spot/preemptible instances"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "enable_secure_boot" {
@@ -104,5 +110,11 @@ variable "auto_upgrade" {
   description = "Enable auto upgrade"
   type        = bool
   default     = true
+}
+
+variable "enable_autoscaling" {
+  description = "Enable autoscaling for the node pool"
+  type        = bool
+  default     = false
 }
 

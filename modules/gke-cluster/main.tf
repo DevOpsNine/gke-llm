@@ -74,6 +74,9 @@ resource "google_container_cluster" "cluster" {
   # Enable features
   enable_shielded_nodes = var.enable_shielded_nodes
   enable_legacy_abac    = false
+  
+  # Deletion protection
+  deletion_protection = var.deletion_protection
 
   # Logging and monitoring
   logging_service    = var.logging_service

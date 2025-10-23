@@ -90,3 +90,9 @@ variable "master_authorized_networks" {
   ]
 }
 
+variable "deletion_protection" {
+  description = "Whether or not to allow Terraform to destroy the cluster"
+  type        = bool
+  default     = false
+}
+

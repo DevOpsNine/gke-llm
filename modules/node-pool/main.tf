@@ -6,6 +6,9 @@ resource "google_container_node_pool" "node_pool" {
   cluster    = var.cluster_name
   project    = var.project_id
   node_count = var.node_count
+  
+  # Specify zones where GPUs are available
+  node_locations = var.node_locations
 
   node_config {
     machine_type = var.machine_type
@@ -56,9 +59,13 @@ resource "google_container_node_pool" "node_pool" {
     spot = var.enable_spot_instances
   }
 
-  autoscaling {
-    min_node_count = var.min_node_count
-    max_node_count = var.max_node_count
+  # Autoscaling (optional)
+  dynamic "autoscaling" {
+    for_each = var.enable_autoscaling ? [1] : []
+    content {
+      min_node_count = var.min_node_count
+      max_node_count = var.max_node_count
+    }
   }
 
   management {
