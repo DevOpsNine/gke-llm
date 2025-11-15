@@ -62,25 +62,6 @@ variable "labels" {
   default     = {}
 }
 
-# GPU Configuration
-variable "gpu_type" {
-  description = "Type of GPU (empty string for CPU-only nodes)"
-  type        = string
-  default     = ""
-}
-
-variable "gpu_count" {
-  description = "Number of GPUs per node"
-  type        = number
-  default     = 0
-}
-
-variable "gpu_driver_version" {
-  description = "GPU driver version"
-  type        = string
-  default     = "DEFAULT"
-}
-
 # Node Configuration
 variable "enable_spot_instances" {
   description = "Enable spot/preemptible instances"

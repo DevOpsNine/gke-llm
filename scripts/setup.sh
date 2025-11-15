@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${YELLOW}GKE LLM Deployment Setup${NC}"
+echo -e "${YELLOW}GKE Cluster Setup${NC}"
 echo "=================================="
 
 # Check if required tools are installed
@@ -67,19 +67,13 @@ gcloud services enable container.googleapis.com
 gcloud services enable servicenetworking.googleapis.com
 echo -e "${GREEN}✓ APIs enabled${NC}"
 
-# Check GPU quota
-echo -e "\n${YELLOW}5. Checking GPU quota...${NC}"
-echo "Current GPU quotas in $REGION:"
-gcloud compute regions describe "$REGION" --format="table(quotas.filter(metric:nvidia))" 2>/dev/null || \
-    echo -e "${YELLOW}Note: Run 'gcloud compute regions describe $REGION' to check quotas${NC}"
-
 # Initialize Terraform
-echo -e "\n${YELLOW}6. Initializing Terraform...${NC}"
+echo -e "\n${YELLOW}5. Initializing Terraform...${NC}"
 terraform init
 echo -e "${GREEN}✓ Terraform initialized${NC}"
 
 # Validate configuration
-echo -e "\n${YELLOW}7. Validating Terraform configuration...${NC}"
+echo -e "\n${YELLOW}6. Validating Terraform configuration...${NC}"
 terraform validate
 echo -e "${GREEN}✓ Configuration valid${NC}"
 
@@ -91,8 +85,8 @@ echo -e "\nNext steps:"
 echo -e "1. Review the plan: ${YELLOW}make plan${NC}"
 echo -e "2. Deploy infrastructure: ${YELLOW}make apply${NC}"
 echo -e "3. Connect to cluster: ${YELLOW}make connect${NC}"
-echo -e "4. Deploy LLM: ${YELLOW}make deploy-llm${NC}"
-echo -e "5. Test deployment: ${YELLOW}make test-llm${NC}"
+echo -e "4. Check status: ${YELLOW}make status${NC}"
+echo -e "5. Check Istio: ${YELLOW}make istio-status${NC}"
 echo -e "\nOr run the full deployment:"
 echo -e "${YELLOW}./scripts/deploy.sh${NC}"
 

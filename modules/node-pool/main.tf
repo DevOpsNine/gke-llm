@@ -1,4 +1,4 @@
-# Node Pool Module - Supports both CPU and GPU node pools
+# Node Pool Module
 
 resource "google_container_node_pool" "node_pool" {
   name       = var.node_pool_name
@@ -7,7 +7,6 @@ resource "google_container_node_pool" "node_pool" {
   project    = var.project_id
   node_count = var.node_count
   
-  # Specify zones where GPUs are available
   node_locations = var.node_locations
 
   node_config {
@@ -15,33 +14,11 @@ resource "google_container_node_pool" "node_pool" {
     disk_size_gb = var.disk_size_gb
     disk_type    = var.disk_type
 
-    # GPU configuration (optional)
-    dynamic "guest_accelerator" {
-      for_each = var.gpu_type != "" ? [1] : []
-      content {
-        type  = var.gpu_type
-        count = var.gpu_count
-        gpu_driver_installation_config {
-          gpu_driver_version = var.gpu_driver_version
-        }
-      }
-    }
-
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
 
     labels = var.labels
-
-    # GPU taint (if GPU is present)
-    dynamic "taint" {
-      for_each = var.gpu_type != "" ? [1] : []
-      content {
-        key    = "nvidia.com/gpu"
-        value  = "present"
-        effect = "NO_SCHEDULE"
-      }
-    }
 
     metadata = {
       disable-legacy-endpoints = "true"

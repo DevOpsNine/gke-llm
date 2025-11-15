@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-echo -e "${YELLOW}Full LLM Deployment Pipeline${NC}"
+echo -e "${YELLOW}GKE Cluster Deployment Pipeline${NC}"
 echo "=================================="
 
 # Run setup
@@ -43,16 +43,12 @@ make connect
 echo -e "\n${YELLOW}Waiting for nodes to be ready...${NC}"
 kubectl wait --for=condition=Ready nodes --all --timeout=600s
 
-# Deploy LLM
-echo -e "\n${YELLOW}Deploying LLM...${NC}"
-make deploy-llm
-
-# Wait for service
-echo -e "\n${YELLOW}Waiting for LoadBalancer IP...${NC}"
+# Wait for Istio Gateway
+echo -e "\n${YELLOW}Waiting for Istio Gateway LoadBalancer IP...${NC}"
 echo "This may take a few minutes..."
 for i in {1..60}; do
-    LLM_IP=$(kubectl get service llm-inference -n llm-inference -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
-    if [ ! -z "$LLM_IP" ]; then
+    GATEWAY_IP=$(kubectl get svc -n istio-system -l istio=ingressgateway -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+    if [ ! -z "$GATEWAY_IP" ]; then
         break
     fi
     echo -n "."
@@ -60,29 +56,30 @@ for i in {1..60}; do
 done
 echo ""
 
-if [ -z "$LLM_IP" ]; then
-    echo -e "${YELLOW}LoadBalancer IP not yet assigned. Check status with: make status${NC}"
+if [ -z "$GATEWAY_IP" ]; then
+    echo -e "${YELLOW}LoadBalancer IP not yet assigned. Check status with: make istio-status${NC}"
 else
-    echo -e "${GREEN}✓ LoadBalancer IP: $LLM_IP${NC}"
+    echo -e "${GREEN}✓ Istio Gateway IP: $GATEWAY_IP${NC}"
 fi
 
 # Show status
 echo -e "\n${YELLOW}Deployment Status:${NC}"
 make status
 
+echo -e "\n${YELLOW}Istio Gateway Status:${NC}"
+make istio-status
+
 # Final message
 echo -e "\n${GREEN}=================================="
 echo -e "Deployment Complete! ✓${NC}"
 echo -e "=================================="
 echo -e "\nUseful commands:"
-echo -e "  Check status: ${YELLOW}make status${NC}"
-echo -e "  View logs: ${YELLOW}make logs${NC}"
-echo -e "  Test LLM: ${YELLOW}make test-llm${NC}"
-echo -e "  GPU check: ${YELLOW}make gpu-check${NC}"
+echo -e "  Check cluster status: ${YELLOW}make status${NC}"
+echo -e "  Check Istio status: ${YELLOW}make istio-status${NC}"
+echo -e "  Format Terraform: ${YELLOW}make format${NC}"
 
-if [ ! -z "$LLM_IP" ]; then
-    echo -e "\nLLM Endpoint: ${GREEN}http://$LLM_IP${NC}"
-    echo -e "\nWait a few minutes for the model to load, then test:"
-    echo -e "${YELLOW}./scripts/test-llm.sh${NC}"
+if [ ! -z "$GATEWAY_IP" ]; then
+    echo -e "\n${GREEN}Istio Gateway IP: $GATEWAY_IP${NC}"
+    echo -e "You can now deploy applications and route traffic through the Istio Gateway."
 fi
 
