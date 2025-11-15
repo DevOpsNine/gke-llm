@@ -1,43 +1,44 @@
-# LLM Deployment on GKE with GPU
+# GKE Cluster with Istio Gateway
 
-This Terraform configuration deploys a production-ready Google Kubernetes Engine (GKE) cluster with GPU nodes for running Large Language Models (LLMs).
+This Terraform configuration deploys a production-ready Google Kubernetes Engine (GKE) cluster with Istio Gateway for service mesh and ingress management.
 
 ## 🏗️ Architecture
 
 - **Modular Design**: Clean separation of concerns with reusable Terraform modules
 - **Private VPC Network**: Custom VPC with private nodes and Cloud NAT
 - **GKE Cluster**: Regional private cluster with high availability
-- **Node Pools**:
-  - **CPU Pool**: For general workloads and system components
-  - **GPU Pool**: For LLM inference with NVIDIA GPUs
-- **Auto-scaling**: Both node pools and pod autoscaling configured
+- **CPU Node Pool**: For general workloads and applications
+- **Istio Service Mesh**: Advanced traffic management and observability
+- **Istio Gateway**: LoadBalancer for external traffic ingress
+- **Auto-scaling**: Node pool autoscaling configured
 - **Security**: Private nodes, Workload Identity, Shielded Nodes, and Network Policies enabled
 
-## 📦 Modular Structure
-
-This project uses a modular Terraform architecture for better maintainability and reusability:
+## 📦 Project Structure
 
 ```
-├── main.tf              # Orchestrates all modules
+├── main.tf                 # Orchestrates all modules
+├── provider.tf             # Provider configuration (Google, Kubernetes, Helm)
+├── istio.tf               # Istio Gateway installation
+├── variables.tf           # Variable definitions
+├── terraform.tfvars       # Your configuration values
+├── outputs.tf             # Output values
 ├── modules/
-│   ├── network/        # VPC and subnet configuration
-│   ├── gke-cluster/    # GKE cluster setup
-│   └── node-pool/      # Node pool management (CPU/GPU)
-├── k8s/                # Kubernetes manifests
-└── scripts/            # Automation scripts
+│   ├── network/           # VPC and subnet configuration
+│   ├── gke-cluster/       # GKE cluster setup
+│   └── node-pool/         # Node pool management
+├── k8s/                   # Kubernetes manifests
+│   ├── test-app-deployment.yaml
+│   └── test-app-gateway.yaml
+└── scripts/               # Automation scripts
+    ├── setup.sh
+    └── deploy.sh
 ```
-
-📖 **Documentation:**
-- **[QUICKSTART.md](QUICKSTART.md)** - Get started in 20 minutes
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and design
-- **[COSTS.md](COSTS.md)** - Cost estimation and optimization
 
 ## 📋 Prerequisites
 
 1. **Google Cloud Platform Account**
    - Active GCP project with billing enabled
-   - Sufficient GPU quota for your region
-
+   
 2. **Local Tools**
    ```bash
    # Install gcloud CLI
@@ -80,22 +81,11 @@ vi terraform.tfvars
 Update `terraform.tfvars` with your project details:
 ```hcl
 project_id   = "your-gcp-project-id"
-project_name = "llm-deployment"
-region       = "us-central1"
+project_name = "your-project-name"
+region       = "us-east4"  # or your preferred region
 ```
 
-### Step 2: Check GPU Quota
-
-```bash
-# Check your GPU quota
-gcloud compute project-info describe --project=YOUR_PROJECT_ID
-
-# Request quota increase if needed
-# Go to: https://console.cloud.google.com/iam-admin/quotas
-# Filter by: "GPUs (all regions)" or specific GPU type
-```
-
-### Step 3: Deploy Infrastructure
+### Step 2: Deploy Infrastructure
 
 ```bash
 # Initialize Terraform
@@ -108,210 +98,223 @@ terraform plan
 terraform apply
 ```
 
-This will take 10-15 minutes to complete.
+This will take 10-15 minutes to complete and will create:
+- VPC Network with subnet
+- GKE Cluster
+- CPU Node Pool
+- Istio Base components
+- Istio Control Plane (Istiod)
+- Istio Gateway with LoadBalancer
 
-### Step 4: Connect to Cluster
+### Step 3: Connect to Cluster
 
 ```bash
 # Get cluster credentials
-gcloud container clusters get-credentials llm-deployment-gke-cluster \
-  --region us-central1 \
-  --project YOUR_PROJECT_ID
+gcloud container clusters get-credentials <cluster-name> \
+  --region <region> \
+  --project <project-id>
 
 # Verify connection
 kubectl get nodes
-kubectl get pods --all-namespaces
+kubectl get pods -n istio-system
 ```
 
-### Step 5: Deploy LLM
+Or use the Makefile:
+```bash
+make connect
+```
 
-Choose your inference framework:
-
-#### Option A: vLLM (Recommended for performance)
+### Step 4: Deploy Test Application
 
 ```bash
-# Create namespace
-kubectl apply -f k8s/namespace.yaml
-
-# Deploy vLLM
-kubectl apply -f k8s/llm-deployment.yaml
-kubectl apply -f k8s/llm-service.yaml
-kubectl apply -f k8s/llm-hpa.yaml
+# Deploy test application
+kubectl apply -f k8s/test-app-deployment.yaml
+kubectl apply -f k8s/test-app-gateway.yaml
 
 # Check deployment
-kubectl get pods -n llm-inference -w
+kubectl get pods -n test-app
+kubectl get gateway,virtualservice -n test-app
 ```
 
-#### Option B: Text Generation Inference (TGI)
+Or use the Makefile:
+```bash
+make deploy-test
+```
+
+### Step 5: Test Istio Gateway
 
 ```bash
-# Create namespace
-kubectl apply -f k8s/namespace.yaml
+# Get Istio Gateway IP
+kubectl get svc istio-gateway -n istio-system
 
-# If using gated models, create secret
-kubectl create secret generic huggingface-token \
-  --from-literal=token=YOUR_HF_TOKEN \
-  -n llm-inference
-
-# Deploy TGI
-kubectl apply -f k8s/text-generation-inference.yaml
-
-# Check deployment
-kubectl get pods -n llm-inference -w
+# Test the gateway (replace with your Gateway IP)
+curl http://<GATEWAY-IP>/html
+curl http://<GATEWAY-IP>/headers
+curl http://<GATEWAY-IP>/ip
 ```
 
-### Step 6: Test the Deployment
-
+Or use the Makefile:
 ```bash
-# Get the external IP
-kubectl get service llm-inference -n llm-inference
-
-# Wait for EXTERNAL-IP to be assigned (may take a few minutes)
-export LLM_ENDPOINT=$(kubectl get service llm-inference -n llm-inference -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-
-# Test with curl (vLLM OpenAI-compatible API)
-curl http://$LLM_ENDPOINT/v1/models
-
-# Generate text
-curl http://$LLM_ENDPOINT/v1/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "mistralai/Mistral-7B-Instruct-v0.2",
-    "prompt": "Write a haiku about Kubernetes:",
-    "max_tokens": 100,
-    "temperature": 0.7
-  }'
+make test-gateway
 ```
 
-## 🎯 GPU Types and Availability
+## 📊 Istio Gateway Features
 
-| GPU Type | Memory | Use Case | Availability |
-|----------|--------|----------|-------------|
-| `nvidia-tesla-t4` | 16GB | Cost-effective inference | Most regions |
-| `nvidia-tesla-v100` | 16GB | High performance | Limited regions |
-| `nvidia-tesla-a100` | 40GB | Large models | Very limited |
-| `nvidia-l4` | 24GB | Latest generation | Select regions |
-
-Check availability:
-```bash
-gcloud compute accelerator-types list --filter="zone:us-central1"
-```
-
-## 📊 Monitoring
-
-### View Pod Logs
-```bash
-kubectl logs -f -n llm-inference -l app=llm-inference
-```
-
-### Check GPU Usage
-```bash
-# Install nvidia-smi on GPU pod
-kubectl exec -it -n llm-inference $(kubectl get pod -n llm-inference -l app=llm-inference -o jsonpath='{.items[0].metadata.name}') -- nvidia-smi
-
-# Watch GPU usage
-kubectl exec -it -n llm-inference $(kubectl get pod -n llm-inference -l app=llm-inference -o jsonpath='{.items[0].metadata.name}') -- watch -n 1 nvidia-smi
-```
-
-### Check Node Status
-```bash
-kubectl describe nodes -l workload=gpu-llm
-```
-
-### View Metrics in GCP Console
-- Navigate to: GKE → Clusters → llm-deployment-gke-cluster → Observability
+- **Traffic Management**: Advanced routing, retries, timeouts, circuit breakers
+- **Security**: mTLS, authentication, authorization policies
+- **Observability**: Metrics, logs, distributed tracing
+- **Load Balancing**: Multiple load balancing algorithms
+- **Canary Deployments**: Traffic splitting for gradual rollouts
+- **Rate Limiting**: Request rate control
+- **Fault Injection**: Test application resilience
 
 ## 🔧 Configuration
 
-### Change Model
+### Change Region/Zone
 
-Edit `k8s/llm-deployment.yaml`:
-```yaml
-env:
-- name: MODEL_NAME
-  value: "mistralai/Mistral-7B-Instruct-v0.2"  # Change this
+Edit `terraform.tfvars`:
+```hcl
+region = "us-central1"
+cpu_node_locations = ["us-central1-a"]
 ```
 
-Popular models:
-- `mistralai/Mistral-7B-Instruct-v0.2` (7B parameters, 16GB VRAM)
-- `meta-llama/Llama-2-7b-chat-hf` (7B parameters, 16GB VRAM)
-- `meta-llama/Llama-2-13b-chat-hf` (13B parameters, 32GB VRAM)
-- `microsoft/phi-2` (2.7B parameters, 6GB VRAM)
-
-### Scale GPU Nodes
+### Scale CPU Nodes
 
 ```bash
-# Manual scaling
-gcloud container clusters resize llm-deployment-gke-cluster \
-  --node-pool gpu-pool \
-  --num-nodes 2 \
-  --region us-central1
+# Manual scaling via gcloud
+gcloud container clusters resize <cluster-name> \
+  --node-pool cpu-pool \
+  --num-nodes 3 \
+  --region <region>
 
 # Or update terraform.tfvars and apply
+cpu_node_count = 3
 ```
 
-### Enable Ingress with Domain
+### Deploy Your Application
 
-1. Update `k8s/ingress.yaml` with your domain
-2. Apply:
+1. Create your deployment and service YAML files
+2. Create a Gateway and VirtualService for routing
+3. Apply the manifests:
+
 ```bash
-kubectl apply -f k8s/ingress.yaml
+kubectl apply -f your-app-deployment.yaml
+kubectl apply -f your-app-gateway.yaml
+```
+
+Example Gateway configuration:
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: my-gateway
+  namespace: my-app
+spec:
+  selector:
+    istio: gateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: my-app
+  namespace: my-app
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - my-gateway
+  http:
+  - route:
+    - destination:
+        host: my-app-service
+        port:
+          number: 80
 ```
 
 ## 💰 Cost Optimization
 
 1. **Use Spot/Preemptible Instances**
-   - Add to GPU node pool in `main.tf`:
+   - Set in `terraform.tfvars`:
    ```hcl
-   spot = true
+   cpu_enable_spot = true
    ```
 
-2. **Scale Down During Off-Hours**
+2. **Right-size Node Pool**
+   - Adjust machine type and node count based on workload
+   - Use smaller machine types for development
+
+3. **Enable Cluster Autoscaler**
+   ```hcl
+   cpu_min_nodes = 1
+   cpu_max_nodes = 5
+   ```
+
+4. **Scale Down When Not in Use**
    ```bash
-   # Scale to 0 nodes
-   gcloud container clusters resize llm-deployment-gke-cluster \
-     --node-pool gpu-pool \
-     --num-nodes 0 \
-     --region us-central1
+   gcloud container clusters resize <cluster-name> \
+     --node-pool cpu-pool \
+     --num-nodes 1 \
+     --region <region>
    ```
 
-3. **Use Cheaper GPU Types**
-   - T4 is most cost-effective for inference
-   - L4 offers better performance per dollar
-
-4. **Enable Cluster Autoscaler**
-   - Already configured in Terraform
-   - Set `gpu_min_nodes = 0` to scale to zero
+5. **Delete Resources When Not Needed**
+   ```bash
+   terraform destroy
+   ```
 
 ## 🐛 Troubleshooting
 
 ### Pods Stuck in Pending
 
 ```bash
-kubectl describe pod -n llm-inference <pod-name>
+kubectl describe pod -n <namespace> <pod-name>
 ```
 
 Common issues:
-- **Insufficient GPU quota**: Request increase in GCP Console
-- **No GPU nodes available**: Check node pool status
-- **Image pull errors**: Verify image name and network connectivity
+- **Insufficient resources**: Scale up node pool
+- **Image pull errors**: Check image name and registry access
+- **Node selector mismatch**: Verify pod scheduling constraints
 
-### GPU Not Detected
+### Istio Gateway Not Working
 
 ```bash
-# Check NVIDIA driver installation
-kubectl get daemonset -n kube-system | grep nvidia
+# Check Gateway status
+kubectl get svc -n istio-system
+kubectl get pods -n istio-system
+kubectl logs -n istio-system -l app=istio-gateway
 
-# Reinstall if needed
-kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded-latest.yaml
+# Check Gateway configuration
+kubectl get gateway,virtualservice -A
+kubectl describe gateway <gateway-name> -n <namespace>
 ```
 
-### Out of Memory
+### Cannot Access Cluster
 
-- Reduce `GPU_MEMORY_UTILIZATION` in deployment
-- Use a smaller model
-- Add more GPUs per node
-- Use quantized models (4-bit, 8-bit)
+```bash
+# Refresh credentials
+gcloud container clusters get-credentials <cluster-name> \
+  --region <region> \
+  --project <project-id>
+
+# Check cluster status in GCP Console
+# Verify master authorized networks allow your IP
+```
+
+### Permission Issues
+
+If you need cluster-admin for Istio:
+```bash
+kubectl create clusterrolebinding cluster-admin-binding \
+  --clusterrole=cluster-admin \
+  --user=<your-email>
+```
 
 ## 🔒 Security Features
 
@@ -344,11 +347,39 @@ master_authorized_networks = [
 ]
 ```
 
+## 📝 Common Commands
+
+```bash
+# View cluster info
+kubectl cluster-info
+
+# Get Istio Gateway IP
+kubectl get svc istio-gateway -n istio-system
+
+# Check Istio pods
+kubectl get pods -n istio-system
+
+# View Gateway configuration
+kubectl get gateway,virtualservice -A
+
+# View test app
+kubectl get all -n test-app
+
+# Port forward to a service
+kubectl port-forward svc/<service-name> 8080:80 -n <namespace>
+
+# View logs
+kubectl logs -f -n <namespace> <pod-name>
+
+# Execute command in pod
+kubectl exec -it -n <namespace> <pod-name> -- /bin/sh
+```
+
 ## 🧹 Cleanup
 
 ```bash
-# Delete Kubernetes resources
-kubectl delete namespace llm-inference
+# Delete test application
+kubectl delete namespace test-app
 
 # Destroy Terraform infrastructure
 terraform destroy
@@ -358,12 +389,19 @@ gcloud compute instances list
 gcloud container clusters list
 ```
 
+Or use the Makefile:
+```bash
+make clean    # Delete test app
+make destroy  # Destroy infrastructure
+```
+
 ## 📚 Additional Resources
 
-- [GKE GPU Documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus)
-- [vLLM Documentation](https://docs.vllm.ai/)
-- [Text Generation Inference](https://github.com/huggingface/text-generation-inference)
-- [GPU Quotas](https://cloud.google.com/compute/quotas)
+- [Istio Documentation](https://istio.io/latest/docs/)
+- [GKE Documentation](https://cloud.google.com/kubernetes-engine/docs)
+- [Terraform GCP Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+- [Istio Traffic Management](https://istio.io/latest/docs/tasks/traffic-management/)
+- [Istio Security](https://istio.io/latest/docs/tasks/security/)
 
 ## 🤝 Contributing
 
@@ -372,4 +410,3 @@ Feel free to submit issues and enhancement requests!
 ## 📄 License
 
 This project is licensed under the MIT License.
-

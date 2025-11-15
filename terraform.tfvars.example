@@ -3,8 +3,8 @@
 
 # Project Configuration
 project_id   = "your-gcp-project-id"
-project_name = "llm-deployment"
-region       = "us-central1"
+project_name = "your-project-name"
+region       = "us-east4"  # Change to your preferred region
 
 # Network Configuration
 subnet_cidr   = "10.0.0.0/24"
@@ -24,21 +24,6 @@ cpu_min_nodes    = 1
 cpu_max_nodes    = 5
 cpu_enable_spot  = false  # Set to true for cost savings (60-70% discount)
 
-# GPU Node Pool Configuration
-# Available GPU types:
-# - nvidia-tesla-t4 (Good for inference, cost-effective, 16GB)
-# - nvidia-tesla-v100 (High performance, 16GB)
-# - nvidia-tesla-a100 (Best performance, most expensive, 40GB)
-# - nvidia-l4 (Latest generation, balanced, 24GB)
-gpu_machine_type    = "n1-standard-8"
-gpu_type            = "nvidia-tesla-t4"
-gpu_count_per_node  = 1
-gpu_driver_version  = "DEFAULT"
-gpu_node_count      = 1
-gpu_min_nodes       = 0  # Scale to 0 when not in use
-gpu_max_nodes       = 3
-gpu_enable_spot     = false  # Set to true for cost savings (60-70% discount)
-
 # Private Cluster Configuration
 enable_private_nodes    = true   # Nodes don't have public IPs (requires Cloud NAT)
 enable_private_endpoint = false  # Control plane accessible from internet (true = private only)
@@ -56,12 +41,9 @@ master_authorized_networks = [
 # Deletion protection (set to false to allow terraform destroy)
 deletion_protection = false
 
-# Node Zones - Use same zone for both CPU and GPU for simplicity
-# Recommended: us-central1-a (good GPU availability)
-# Single zone:
-cpu_node_locations = ["us-central1-a"]
-gpu_node_locations = ["us-central1-a"]
+# Node Zones
+# Single zone (recommended for cost savings):
+cpu_node_locations = ["us-east4-c"]
 
-# Multi-zone (for HA):
-# cpu_node_locations = ["us-central1-a", "us-central1-c"]
-# gpu_node_locations = ["us-central1-a", "us-central1-c"]
+# Multi-zone (for high availability):
+# cpu_node_locations = ["us-east4-a", "us-east4-b", "us-east4-c"]

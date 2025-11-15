@@ -40,30 +40,30 @@ output "cpu_node_pool_name" {
   value       = module.cpu_node_pool.node_pool_name
 }
 
-output "gpu_node_pool_name" {
-  description = "GPU node pool name"
-  value       = module.gpu_node_pool.node_pool_name
-}
-
 # Connection Command
 output "kubectl_connection_command" {
   description = "Command to connect kubectl to the cluster"
   value       = "gcloud container clusters get-credentials ${module.gke_cluster.cluster_name} --region ${var.region} --project ${var.project_id}"
 }
 
-# GPU Information
-output "gpu_type" {
-  description = "GPU type attached to nodes"
-  value       = var.gpu_type
-}
-
-output "gpu_count_per_node" {
-  description = "Number of GPUs per node"
-  value       = var.gpu_count_per_node
-}
-
 # Project Information
 output "project_id" {
   description = "GCP Project ID"
   value       = var.project_id
+}
+
+# Istio Gateway Information
+output "istio_gateway_namespace" {
+  description = "Istio Gateway namespace"
+  value       = "istio-system"
+}
+
+output "istio_gateway_service_name" {
+  description = "Istio Gateway service name"
+  value       = "istio-gateway"
+}
+
+output "istio_gateway_ip_command" {
+  description = "Command to get Istio Gateway LoadBalancer IP"
+  value       = "kubectl get svc istio-gateway -n istio-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
 }

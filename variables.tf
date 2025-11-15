@@ -9,7 +9,7 @@ variable "project_id" {
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "llm-deployment"
+  default     = "gke-cluster"
 }
 
 variable "region" {
@@ -99,59 +99,6 @@ variable "cpu_node_locations" {
   default     = []
 }
 
-# GPU Node Pool Configuration
-variable "gpu_machine_type" {
-  description = "Machine type for GPU node pool (must be compatible with GPUs)"
-  type        = string
-  default     = "n1-standard-8"
-}
-
-variable "gpu_type" {
-  description = "Type of GPU to attach to nodes. Options: nvidia-tesla-t4, nvidia-tesla-v100, nvidia-tesla-p4, nvidia-tesla-a100, nvidia-l4"
-  type        = string
-  default     = "nvidia-tesla-t4"
-}
-
-variable "gpu_count_per_node" {
-  description = "Number of GPUs to attach to each node"
-  type        = number
-  default     = 1
-  validation {
-    condition     = var.gpu_count_per_node >= 1 && var.gpu_count_per_node <= 8
-    error_message = "GPU count per node must be between 1 and 8."
-  }
-}
-
-variable "gpu_driver_version" {
-  description = "GPU driver version to install"
-  type        = string
-  default     = "DEFAULT"
-}
-
-variable "gpu_node_count" {
-  description = "Initial number of GPU nodes"
-  type        = number
-  default     = 1
-}
-
-variable "gpu_min_nodes" {
-  description = "Minimum number of GPU nodes"
-  type        = number
-  default     = 0
-}
-
-variable "gpu_max_nodes" {
-  description = "Maximum number of GPU nodes"
-  type        = number
-  default     = 3
-}
-
-variable "gpu_enable_spot" {
-  description = "Enable spot/preemptible instances for GPU nodes"
-  type        = bool
-  default     = false
-}
-
 # Private Cluster Configuration
 variable "enable_private_nodes" {
   description = "Enable private nodes (nodes will not have external IP addresses)"
@@ -189,10 +136,4 @@ variable "deletion_protection" {
   description = "Whether or not to allow Terraform to destroy the cluster. Set to false to allow deletion."
   type        = bool
   default     = false
-}
-
-variable "gpu_node_locations" {
-  description = "Specific zones for GPU nodes (e.g., [\"us-central1-a\", \"us-central1-c\"]). Leave empty for all zones."
-  type        = list(string)
-  default     = []
 }
