@@ -16,8 +16,8 @@ This Terraform configuration deploys a production-ready Google Kubernetes Engine
 ## 📦 Project Structure
 
 ```
-├── main.tf                 # Orchestrates all modules
-├── provider.tf             # Provider configuration (Google, Kubernetes, Helm)
+├── main.tf                # Orchestrates all modules
+├── provider.tf            # Provider configuration (Google, Kubernetes, Helm)
 ├── istio.tf               # Istio Gateway installation
 ├── variables.tf           # Variable definitions
 ├── terraform.tfvars       # Your configuration values
