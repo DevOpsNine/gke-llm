@@ -59,14 +59,14 @@ module "cpu_node_pool" {
   max_node_count = var.cpu_max_nodes
 
   disk_size_gb = 100
-  disk_type    = "pd-standard"
+  disk_type    = "pd-balanced"
 
   labels = {
     workload = "general"
   }
 
   enable_spot_instances = var.cpu_enable_spot
-  enable_autoscaling    = false
+  enable_autoscaling    = true
   
   # Specify zones for CPU nodes
   node_locations = var.cpu_node_locations
