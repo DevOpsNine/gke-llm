@@ -1,6 +1,18 @@
 # Istio Service Mesh Installation
 # This file installs Istio Gateway and control plane using Helm
 
+# Initialize Helm and add Istio repository
+resource "null_resource" "helm_repo_add" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      helm repo add istio https://istio-release.storage.googleapis.com/charts
+      helm repo update
+    EOT
+  }
+
+  depends_on = [null_resource.get_cluster_credentials]
+}
+
 # Add Istio Helm repository
 resource "helm_release" "istio_base" {
   name       = "istio-base"
@@ -9,7 +21,7 @@ resource "helm_release" "istio_base" {
   namespace  = "istio-system"
   create_namespace = true
 
-  depends_on = [null_resource.get_cluster_credentials]
+  depends_on = [null_resource.helm_repo_add]
 }
 
 # Install Istiod (Istio control plane)

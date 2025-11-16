@@ -1,10 +1,16 @@
-.PHONY: help init plan apply destroy connect status validate format
+.PHONY: help init plan apply destroy connect status validate format setup-backend migrate-state
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
 	@echo ''
 	@echo 'Available targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-20s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+setup-backend: ## Setup GCS backend for Terraform state (run once)
+	./scripts/setup-backend.sh
+
+migrate-state: ## Migrate local state to GCS backend
+	terraform init -migrate-state
 
 init: ## Initialize Terraform
 	terraform init
