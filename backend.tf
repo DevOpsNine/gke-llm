@@ -5,13 +5,17 @@
 # - Versioning (state history and rollback capability)
 # - Encryption at rest (automatic with GCS)
 #
-# To enable remote backend:
-# 1. Run: ./scripts/setup-backend.sh
-# 2. Uncomment the backend block below
-# 3. Run: terraform init -migrate-state
-# 4. Confirm migration when prompted
+# Quick Setup:
+# 1. Run: make backend-full (creates bucket and migrates state)
+#
+# Or step-by-step:
+# 1. Run: make setup-backend (creates GCS bucket)
+# 2. Run: make migrate-state (migrates local state to GCS)
+#
+# Check status:
+# - Run: make backend-status
 
-# Uncomment after running setup-backend.sh:
+# Backend configuration (already enabled):
 terraform {
   backend "gcs" {
     bucket  = "secops-311714-terraform-state"  # Replace with your bucket name
