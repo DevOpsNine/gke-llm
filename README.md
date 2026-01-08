@@ -4,6 +4,109 @@ This Terraform configuration deploys a production-ready Google Kubernetes Engine
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TB
+    subgraph User["👤 User / Developer"]
+        TF[Terraform Commands]
+        KUB[kubectl Commands]
+        CURL[HTTP Requests]
+    end
+
+    subgraph TerraformModules["🏗️ Terraform Modules"]
+        MAIN[main.tf<br/>Orchestrator]
+        NET[Network Module<br/>VPC + Subnets]
+        GKE[GKE Cluster Module<br/>Private Cluster]
+        NODES[Node Pool Module<br/>CPU Pool]
+    end
+
+    subgraph GCP["☁️ Google Cloud Platform"]
+        VPC[VPC Network<br/>Custom Subnet]
+        NAT[Cloud NAT<br/>Private Internet Access]
+        GKE_CLUSTER[GKE Cluster<br/>Regional + Private]
+        NODE_POOL[Node Pool<br/>Auto-scaling CPU Nodes]
+        LB[External LoadBalancer<br/>Istio Gateway IP]
+    end
+
+    subgraph Kubernetes["⚓ Kubernetes Cluster"]
+        ISTIO_NS[istio-system namespace]
+        APP_NS[test-app namespace]
+        
+        subgraph IstioComponents["Istio Service Mesh"]
+            ISTIOD[istiod<br/>Control Plane]
+            GATEWAY[istio-gateway<br/>LoadBalancer Service]
+        end
+        
+        subgraph AppComponents["Application"]
+            DEPLOY[test-app<br/>Deployment]
+            SVC[test-app-service<br/>ClusterIP]
+            GW[Gateway<br/>Istio Config]
+            VS[VirtualService<br/>Routing Rules]
+        end
+    end
+
+    subgraph Workflow["📋 Deployment Workflow"]
+        S1[1. terraform init]
+        S2[2. terraform plan]
+        S3[3. terraform apply]
+        S4[4. kubectl connect]
+        S5[5. Deploy test-app]
+        S6[6. Test Gateway]
+    end
+
+    TF -->|terraform apply| MAIN
+    MAIN -->|creates| NET
+    MAIN -->|creates| GKE
+    MAIN -->|creates| NODES
+    
+    NET -->|provisions| VPC
+    NET -->|provisions| NAT
+    GKE -->|creates| GKE_CLUSTER
+    NODES -->|creates| NODE_POOL
+    
+    GKE_CLUSTER -->|hosts| ISTIO_NS
+    GKE_CLUSTER -->|hosts| APP_NS
+    
+    ISTIO_NS -->|contains| ISTIOD
+    ISTIO_NS -->|contains| GATEWAY
+    
+    APP_NS -->|contains| DEPLOY
+    APP_NS -->|contains| SVC
+    APP_NS -->|contains| GW
+    APP_NS -->|contains| VS
+    
+    GATEWAY -->|exposes via| LB
+    
+    KUB -->|kubectl apply| DEPLOY
+    KUB -->|kubectl apply| GW
+    KUB -->|kubectl apply| VS
+    
+    CURL -->|HTTP Request| LB
+    LB -->|routes to| GATEWAY
+    GATEWAY -->|matches| GW
+    GW -->|routes via| VS
+    VS -->|forwards to| SVC
+    SVC -->|load balances| DEPLOY
+    
+    VPC -.->|network| GKE_CLUSTER
+    NAT -.->|egress| NODE_POOL
+    
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> S5
+    S5 --> S6
+
+    style User fill:#e1f5ff
+    style TerraformModules fill:#fff4e6
+    style GCP fill:#f0f4ff
+    style Kubernetes fill:#f0fff4
+    style IstioComponents fill:#fff0f6
+    style AppComponents fill:#f9f0ff
+    style Workflow fill:#fffbf0
+```
+
+### Architecture Overview
+
 - **Modular Design**: Clean separation of concerns with reusable Terraform modules
 - **Private VPC Network**: Custom VPC with private nodes and Cloud NAT
 - **GKE Cluster**: Regional private cluster with high availability
