@@ -137,3 +137,40 @@ variable "deletion_protection" {
   type        = bool
   default     = false
 }
+
+# Cloud SQL Configuration
+variable "db_tier" {
+  description = "The tier (machine type) for the database"
+  type        = string
+  default     = "db-f1-micro"
+}
+
+variable "db_version" {
+  description = "The PostgreSQL version to use"
+  type        = string
+  default     = "POSTGRES_18"
+}
+
+variable "db_name" {
+  description = "Name of the default database"
+  type        = string
+  default     = "app_db"
+}
+
+variable "db_user" {
+  description = "Name of the default database user"
+  type        = string
+  default     = "app_user"
+}
+
+variable "db_password" {
+  description = "Password for the default database user"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_availability_type" {
+  description = "The availability type of the Cloud SQL instance (ZONAL or REGIONAL)"
+  type        = string
+  default     = "ZONAL"
+}

@@ -38,3 +38,7 @@ output "nat_name" {
   value       = google_compute_router_nat.nat.name
 }
 
+output "private_vpc_connection_id" {
+  description = "The ID of the VPC peering connection"
+  value       = google_service_networking_connection.private_vpc_connection.id
+}

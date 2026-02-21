@@ -67,3 +67,29 @@ output "istio_gateway_ip_command" {
   description = "Command to get Istio Gateway LoadBalancer IP"
   value       = "kubectl get svc istio-gateway -n istio-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}'"
 }
+
+# Cloud SQL Outputs
+output "db_instance_name" {
+  description = "Cloud SQL instance name"
+  value       = module.cloud_sql.instance_name
+}
+
+output "db_connection_name" {
+  description = "Cloud SQL instance connection name"
+  value       = module.cloud_sql.instance_connection_name
+}
+
+output "db_private_ip" {
+  description = "Cloud SQL private IP address"
+  value       = module.cloud_sql.private_ip_address
+}
+
+output "db_name" {
+  description = "Default database name"
+  value       = module.cloud_sql.db_name
+}
+
+output "db_user" {
+  description = "Default database user"
+  value       = module.cloud_sql.db_user
+}

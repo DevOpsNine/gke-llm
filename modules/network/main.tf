@@ -50,3 +50,29 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
+# Private IP for Cloud SQL and other services
+resource "google_compute_global_address" "private_ip_address" {
+  name          = "${var.network_name}-private-ip"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc.id
+  project       = var.project_id
+}
+
+resource "google_service_networking_connection" "private_vpc_connection" {
+  network                 = google_compute_network.vpc.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
+}
+
+# Export custom routes to the service producer (Cloud SQL) 
+# This is necessary for GKE pods using alias IPs to reach the database
+resource "google_compute_network_peering_routes_config" "peering_routes" {
+  peering = google_service_networking_connection.private_vpc_connection.peering
+  network = google_compute_network.vpc.name
+  project = var.project_id
+
+  export_custom_routes = true
+  import_custom_routes = true
+}

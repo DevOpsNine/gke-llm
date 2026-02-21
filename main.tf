@@ -73,3 +73,25 @@ module "cpu_node_pool" {
 
   depends_on = [module.gke_cluster]
 }
+
+# Cloud SQL PostgreSQL Module
+module "cloud_sql" {
+  source = "./modules/cloud-sql"
+
+  project_id    = var.project_id
+  region        = var.region
+  instance_name = "${var.project_name}-postgres-db"
+  
+  database_version = var.db_version
+  tier             = var.db_tier
+  network_id       = module.network.network_id
+  
+  db_name     = var.db_name
+  db_user     = var.db_user
+  db_password = var.db_password
+  
+  availability_type = var.db_availability_type
+  
+  # Ensure VPC peering is established before creating the DB
+  depends_on = [module.network]
+}
