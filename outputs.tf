@@ -93,3 +93,15 @@ output "db_user" {
   description = "Default database user"
   value       = module.cloud_sql.db_user
 }
+
+# ArgoCD Outputs
+output "argocd_username" {
+  description = "ArgoCD admin username"
+  value       = "admin"
+}
+
+output "argocd_password" {
+  description = "ArgoCD admin password"
+  value       = data.kubernetes_secret.argocd_initial_admin_secret.data["password"]
+  sensitive   = true
+}
