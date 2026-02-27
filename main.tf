@@ -13,18 +13,20 @@ module "network" {
   subnet_cidr   = var.subnet_cidr
   pods_cidr     = var.pods_cidr
   services_cidr = var.services_cidr
+
+  labels = var.labels
 }
 
 # GKE Cluster Module
 module "gke_cluster" {
   source = "./modules/gke-cluster"
 
-  project_id      = var.project_id
-  cluster_name    = "${var.project_name}-gke-cluster"
-  region          = var.region
-  network_name    = module.network.network_name
-  subnet_name     = module.network.subnet_name
-  pods_range_name = module.network.pods_range_name
+  project_id          = var.project_id
+  cluster_name        = "${var.project_name}-gke-cluster"
+  region              = var.region
+  network_name        = module.network.network_name
+  subnet_name         = module.network.subnet_name
+  pods_range_name     = module.network.pods_range_name
   services_range_name = module.network.services_range_name
 
   maintenance_start_time = var.maintenance_start_time
@@ -33,13 +35,15 @@ module "gke_cluster" {
   monitoring_service     = var.monitoring_service
 
   # Private cluster configuration
-  enable_private_nodes        = var.enable_private_nodes
-  enable_private_endpoint     = var.enable_private_endpoint
-  master_ipv4_cidr_block      = var.master_ipv4_cidr_block
-  master_authorized_networks  = var.master_authorized_networks
-  
+  enable_private_nodes       = var.enable_private_nodes
+  enable_private_endpoint    = var.enable_private_endpoint
+  master_ipv4_cidr_block     = var.master_ipv4_cidr_block
+  master_authorized_networks = var.master_authorized_networks
+
   # Deletion protection
   deletion_protection = var.deletion_protection
+
+  labels = var.labels
 
   depends_on = [module.network]
 }
@@ -61,13 +65,16 @@ module "cpu_node_pool" {
   disk_size_gb = 100
   disk_type    = "pd-balanced"
 
-  labels = {
-    workload = "general"
-  }
+  labels = merge(
+    var.labels,
+    {
+      workload = "general"
+    }
+  )
 
   enable_spot_instances = var.cpu_enable_spot
   enable_autoscaling    = true
-  
+
   # Specify zones for CPU nodes
   node_locations = var.cpu_node_locations
 
@@ -81,17 +88,19 @@ module "cloud_sql" {
   project_id    = var.project_id
   region        = var.region
   instance_name = "${var.project_name}-postgres-db"
-  
+
   database_version = var.db_version
   tier             = var.db_tier
   network_id       = module.network.network_id
-  
+
   db_name     = var.db_name
   db_user     = var.db_user
   db_password = var.db_password
-  
+
   availability_type = var.db_availability_type
-  
+
+  labels = var.labels
+
   # Ensure VPC peering is established before creating the DB
   depends_on = [module.network]
 }

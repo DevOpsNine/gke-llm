@@ -21,6 +21,7 @@ resource "google_sql_database_instance" "postgres" {
     }
 
     disk_autoresize = true
+    user_labels     = var.labels
   }
 
   deletion_protection = var.deletion_protection

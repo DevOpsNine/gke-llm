@@ -54,6 +54,10 @@ variable "disk_type" {
   description = "Disk type (pd-standard or pd-ssd)"
   type        = string
   default     = "pd-standard"
+  validation {
+    condition     = contains(["pd-standard", "pd-balanced", "pd-ssd"], var.disk_type)
+    error_message = "Disk type must be one of: pd-standard, pd-balanced, pd-ssd."
+  }
 }
 
 variable "labels" {

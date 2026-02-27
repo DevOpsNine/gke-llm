@@ -6,7 +6,7 @@ resource "google_container_node_pool" "node_pool" {
   cluster    = var.cluster_name
   project    = var.project_id
   node_count = var.node_count
-  
+
   node_locations = var.node_locations
 
   node_config {

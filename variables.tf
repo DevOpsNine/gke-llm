@@ -174,3 +174,12 @@ variable "db_availability_type" {
   type        = string
   default     = "ZONAL"
 }
+
+variable "labels" {
+  description = "Labels to apply to all resources"
+  type        = map(string)
+  default = {
+    environment = "dev"
+    managed_by  = "terraform"
+  }
+}

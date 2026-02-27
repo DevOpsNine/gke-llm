@@ -17,6 +17,10 @@ variable "database_version" {
   description = "The PostgreSQL version to use"
   type        = string
   default     = "POSTGRES_18"
+  validation {
+    condition     = can(regex("^POSTGRES_[0-9]+$", var.database_version))
+    error_message = "Database version must follow format POSTGRES_X (e.g., POSTGRES_18)."
+  }
 }
 
 variable "tier" {
@@ -58,4 +62,10 @@ variable "deletion_protection" {
   description = "Whether or not to allow Terraform to destroy the instance"
   type        = bool
   default     = false
+}
+
+variable "labels" {
+  description = "Labels to apply to the resources"
+  type        = map(string)
+  default     = {}
 }

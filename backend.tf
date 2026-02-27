@@ -18,8 +18,8 @@
 # Backend configuration (already enabled):
 terraform {
   backend "gcs" {
-    bucket  = "secops-311714-terraform-state"  # Replace with your bucket name
-    prefix  = "terraform/state"
+    bucket = "secops-311714-terraform-state" # Replace with your bucket name
+    prefix = "terraform/state"
   }
 }
 

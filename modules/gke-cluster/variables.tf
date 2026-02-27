@@ -74,6 +74,10 @@ variable "master_ipv4_cidr_block" {
   description = "The IP range in CIDR notation for the master network"
   type        = string
   default     = "172.16.0.0/28"
+  validation {
+    condition     = can(regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}/[0-9]{1,2}$", var.master_ipv4_cidr_block))
+    error_message = "CIDR block must be a valid IPv4 CIDR notation."
+  }
 }
 
 variable "master_authorized_networks" {
@@ -96,3 +100,8 @@ variable "deletion_protection" {
   default     = false
 }
 
+variable "labels" {
+  description = "Labels to apply to the cluster"
+  type        = map(string)
+  default     = {}
+}

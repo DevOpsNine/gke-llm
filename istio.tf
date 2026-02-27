@@ -15,10 +15,10 @@ resource "null_resource" "helm_repo_add" {
 
 # Add Istio Helm repository
 resource "helm_release" "istio_base" {
-  name       = "istio-base"
-  repository = "https://istio-release.storage.googleapis.com/charts"
-  chart      = "base"
-  namespace  = "istio-system"
+  name             = "istio-base"
+  repository       = "https://istio-release.storage.googleapis.com/charts"
+  chart            = "base"
+  namespace        = "istio-system"
   create_namespace = true
 
   depends_on = [null_resource.helm_repo_add]

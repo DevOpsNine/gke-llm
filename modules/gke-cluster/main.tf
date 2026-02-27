@@ -14,6 +14,8 @@ resource "google_container_cluster" "cluster" {
   network    = var.network_name
   subnetwork = var.subnet_name
 
+  resource_labels = var.labels
+
   # IP allocation policy for VPC-native cluster
   ip_allocation_policy {
     cluster_secondary_range_name  = var.pods_range_name
@@ -74,7 +76,7 @@ resource "google_container_cluster" "cluster" {
   # Enable features
   enable_shielded_nodes = var.enable_shielded_nodes
   enable_legacy_abac    = false
-  
+
   # Deletion protection
   deletion_protection = var.deletion_protection
 
